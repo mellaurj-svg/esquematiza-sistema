@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grupo Esquematiza — Sistema 360°</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde: #1a4a2e;
+    --verde-medio: #235c39;
+    --verde-claro: #2d7a4a;
+    --verde-menta: #3a9660;
+    --verde-bg: #e8f5ed;
+    --verde-border: #b8ddc5;
+    --branco: #ffffff;
+    --cinza-bg: #f4f6f5;
+    --cinza-texto: #6b7c74;
+    --cinza-border: #d4ddd9;
+    --texto-dark: #0f2a1a;
+    --danger: #c0392b;
+    --danger-bg: #fdf0ef;
+    --warning: #d68910;
+    --warning-bg: #fef9ec;
+    --info: #1a6a9a;
+    --info-bg: #eaf4fb;
+    --success: #1a7a3a;
+    --success-bg: #e8f5ed;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cinza-bg); color: var(--texto-dark); min-height: 100vh; }
+  .app { display: flex; height: 100vh; overflow: hidden; }
+
+  /* SIDEBAR */
+  .sidebar { width: 240px; min-width: 240px; background: var(--verde); display: flex; flex-direction: column; height: 100vh; overflow-y: auto; scrollbar-width: none; }
+  .sidebar::-webkit-scrollbar { display: none; }
+  .logo-area { padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .logo-badge { width: 40px; height: 40px; background: var(--branco); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+  .logo-badge span { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; color: var(--verde); }
+  .logo-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; color: #fff; line-height: 1.2; }
+  .logo-sub { font-size: 10px; color: rgba(255,255,255,0.5); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.8px; }
+  .nav-section { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .nav-label { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 1.2px; padding: 6px 20px 4px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 20px; cursor: pointer; transition: all 0.15s; color: rgba(255,255,255,0.65); font-size: 13px; font-weight: 400; border-left: 3px solid transparent; }
+  .nav-item:hover { background: rgba(255,255,255,0.06); color: #fff; border-left-color: rgba(255,255,255,0.3); }
+  .nav-item.active { background: rgba(255,255,255,0.12); color: #fff; border-left-color: #fff; font-weight: 500; }
+  .nav-icon { font-size: 15px; width: 18px; text-align: center; }
+  .nav-badge { margin-left: auto; background: #c0392b; color: #fff; font-size: 9px; font-weight: 600; padding: 2px 6px; border-radius: 10px; min-width: 18px; text-align: center; }
+  .nav-badge.green { background: var(--verde-claro); }
+  .user-area { margin-top: auto; padding: 14px 16px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .user-avatar { width: 32px; height: 32px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; flex-shrink: 0; }
+  .user-info { flex: 1; overflow: hidden; }
+  .user-name { font-size: 12px; font-weight: 500; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .user-role { font-size: 10px; color: rgba(255,255,255,0.45); }
+
+  /* MAIN */
+  .main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+  .topbar { background: var(--branco); border-bottom: 1px solid var(--cinza-border); padding: 14px 28px; display: flex; align-items: center; gap: 16px; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 17px; color: var(--texto-dark); flex: 1; }
+  .topbar-subtitle { font-size: 12px; color: var(--cinza-texto); font-weight: 400; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: all 0.15s; font-family: 'DM Sans', sans-serif; }
+  .btn-primary { background: var(--verde); color: #fff; }
+  .btn-primary:hover { background: var(--verde-medio); }
+  .btn-outline { background: transparent; color: var(--verde); border: 1px solid var(--verde-border); }
+  .btn-outline:hover { background: var(--verde-bg); }
+  .btn-ghost { background: transparent; color: var(--cinza-texto); border: 1px solid var(--cinza-border); }
+  .btn-ghost:hover { background: var(--cinza-bg); color: var(--texto-dark); }
+  .content { padding: 24px 28px; flex: 1; }
+
+  /* CARDS */
+  .card { background: var(--branco); border-radius: 12px; border: 1px solid var(--cinza-border); padding: 20px; }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .card-title { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 14px; color: var(--texto-dark); }
+  .card-action { font-size: 12px; color: var(--verde-claro); cursor: pointer; font-weight: 500; }
+  .card-action:hover { text-decoration: underline; }
+
+  /* KPI */
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 22px; }
+  .kpi-card { background: var(--branco); border: 1px solid var(--cinza-border); border-radius: 12px; padding: 18px; cursor: pointer; transition: all 0.15s; }
+  .kpi-card:hover { border-color: var(--verde-border); box-shadow: 0 2px 12px rgba(26,74,46,0.08); }
+  .kpi-card.destaque { border-color: var(--verde-border); background: linear-gradient(135deg, #fff 70%, var(--verde-bg)); }
+  .kpi-icon { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; margin-bottom: 12px; }
+  .kpi-icon.green { background: var(--verde-bg); }
+  .kpi-icon.red { background: var(--danger-bg); }
+  .kpi-icon.yellow { background: var(--warning-bg); }
+  .kpi-icon.blue { background: var(--info-bg); }
+  .kpi-label { font-size: 11px; color: var(--cinza-texto); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .kpi-value { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: var(--texto-dark); line-height: 1.1; }
+  .kpi-change { font-size: 11px; margin-top: 4px; display: flex; align-items: center; gap: 3px; }
+  .kpi-change.up { color: var(--success); }
+  .kpi-change.down { color: var(--danger); }
+  .kpi-change.neutral { color: var(--cinza-texto); }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead tr { border-bottom: 1px solid var(--cinza-border); }
+  th { text-align: left; padding: 8px 12px; font-size: 11px; font-weight: 600; color: var(--cinza-texto); text-transform: uppercase; letter-spacing: 0.5px; }
+  td { padding: 11px 12px; border-bottom: 1px solid rgba(212,221,217,0.4); vertical-align: middle; }
+  tbody tr:hover { background: var(--cinza-bg); }
+  tbody tr:last-child td { border-bottom: none; }
+
+  /* BADGE */
+  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+  .badge-success { background: var(--success-bg); color: var(--success); }
+  .badge-danger { background: var(--danger-bg); color: var(--danger); }
+  .badge-warning { background: var(--warning-bg); color: var(--warning); }
+  .badge-info { background: var(--info-bg); color: var(--info); }
+  .badge-neutral { background: var(--cinza-bg); color: var(--cinza-texto); border: 1px solid var(--cinza-border); }
+
+  /* PROGRESS */
+  .progress-row { margin-bottom: 12px; }
+  .progress-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+  .progress-name { font-size: 13px; color: var(--texto-dark); }
+  .progress-pct { font-size: 12px; font-weight: 600; color: var(--texto-dark); }
+  .progress-bar { height: 6px; background: var(--cinza-bg); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 99px; background: var(--verde-claro); }
+  .progress-fill.red { background: var(--danger); }
+  .progress-fill.yellow { background: var(--warning); }
+
+  /* BARS */
+  .chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 100px; padding: 0 4px; }
+  .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .bar { width: 100%; border-radius: 4px 4px 0 0; background: var(--verde-bg); border: 1px solid var(--verde-border); cursor: pointer; }
+  .bar:hover { background: var(--verde-medio); }
+  .bar.active { background: var(--verde); border-color: var(--verde); }
+  .bar-label { font-size: 10px; color: var(--cinza-texto); }
+
+  /* DONUT */
+  .donut-wrap { display: flex; align-items: center; gap: 20px; }
+  .donut-legend { flex: 1; }
+  .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 12px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+  /* ALERTA */
+  .alerta-row { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 8px; margin-bottom: 8px; font-size: 13px; cursor: pointer; border: 1px solid transparent; }
+  .alerta-row:hover { border-color: var(--cinza-border); }
+  .alerta-row.danger { background: var(--danger-bg); }
+  .alerta-row.warning { background: var(--warning-bg); }
+  .alerta-row.info { background: var(--info-bg); }
+  .alerta-icon { font-size: 16px; }
+  .alerta-texto { flex: 1; line-height: 1.4; color: var(--texto-dark); }
+  .alerta-data { font-size: 11px; color: var(--cinza-texto); white-space: nowrap; }
+
+  /* TIMELINE */
+  .timeline-item { display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(212,221,217,0.4); }
+  .timeline-item:last-child { border-bottom: none; }
+  .timeline-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .timeline-dot.green { background: var(--verde-claro); }
+  .timeline-dot.red { background: var(--danger); }
+  .timeline-dot.yellow { background: var(--warning); }
+  .timeline-content { flex: 1; }
+  .timeline-titulo { font-size: 13px; font-weight: 500; color: var(--texto-dark); }
+  .timeline-subtitulo { font-size: 11px; color: var(--cinza-texto); margin-top: 2px; }
+  .timeline-hora { font-size: 10px; color: var(--cinza-texto); white-space: nowrap; }
+
+  /* AVATAR */
+  .avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--verde-bg); color: var(--verde); font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--verde-border); }
+
+  /* PAGES */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* FORM */
+  .form-group { margin-bottom: 14px; }
+  .form-label { display: block; font-size: 12px; font-weight: 500; color: var(--cinza-texto); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .form-input { width: 100%; padding: 9px 12px; border: 1px solid var(--cinza-border); border-radius: 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--texto-dark); background: var(--branco); outline: none; }
+  .form-input:focus { border-color: var(--verde-claro); box-shadow: 0 0 0 3px rgba(45,122,74,0.1); }
+  .form-select { width: 100%; padding: 9px 12px; border: 1px solid var(--cinza-border); border-radius: 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--texto-dark); background: var(--branco); outline: none; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  /* MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 100; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--branco); border-radius: 14px; width: 520px; max-width: 95vw; max-height: 90vh; overflow-y: auto; }
+  .modal-header { padding: 20px 22px 16px; border-bottom: 1px solid var(--cinza-border); display: flex; align-items: center; justify-content: space-between; }
+  .modal-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; }
+  .modal-close { cursor: pointer; font-size: 18px; color: var(--cinza-texto); }
+  .modal-body { padding: 20px 22px; }
+  .modal-footer { padding: 14px 22px; border-top: 1px solid var(--cinza-border); display: flex; gap: 10px; justify-content: flex-end; }
+
+  /* SWITCH */
+  .switch-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(212,221,217,0.4); }
+  .switch-label { font-weight: 500; color: var(--texto-dark); font-size: 13px; }
+  .switch-desc { font-size: 11px; color: var(--cinza-texto); margin-top: 2px; }
+  .switch { width: 36px; height: 20px; background: var(--cinza-border); border-radius: 99px; cursor: pointer; position: relative; transition: background 0.2s; flex-shrink: 0; }
+  .switch.on { background: var(--verde-claro); }
+  .switch::after { content: ''; position: absolute; width: 14px; height: 14px; background: #fff; border-radius: 50%; top: 3px; left: 3px; transition: left 0.2s; }
+  .switch.on::after { left: 19px; }
+
+  /* MINI STAT */
+  .mini-stat { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(212,221,217,0.3); font-size: 13px; }
+  .mini-stat:last-child { border-bottom: none; }
+  .mini-stat-label { color: var(--cinza-texto); }
+  .mini-stat-value { font-weight: 600; color: var(--texto-dark); }
+  .mini-stat-value.green { color: var(--success); }
+  .mini-stat-value.red { color: var(--danger); }
+
+  /* SEARCH */
+  .search-bar { display: flex; align-items: center; gap: 8px; background: var(--cinza-bg); border: 1px solid var(--cinza-border); border-radius: 8px; padding: 8px 12px; flex: 1; }
+  .search-bar input { border: none; background: transparent; font-size: 13px; color: var(--texto-dark); outline: none; width: 100%; font-family: 'DM Sans', sans-serif; }
+
+  /* EMPTY */
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--cinza-texto); }
+  .empty-icon { font-size: 36px; margin-bottom: 10px; }
+  .empty-title { font-size: 15px; font-weight: 600; color: var(--texto-dark); margin-bottom: 6px; }
+  .empty-desc { font-size: 13px; line-height: 1.6; }
+
+  /* SCROLLBAR */
+  .main::-webkit-scrollbar { width: 4px; }
+  .main::-webkit-scrollbar-thumb { background: var(--cinza-border); border-radius: 4px; }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    .sidebar { width: 200px; min-width: 200px; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .grid-2 { grid-template-columns: 1fr; }
+    .content { padding: 16px; }
+    .topbar { padding: 12px 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="logo-area">
+      <div class="logo-badge"><span>E</span></div>
+      <div class="logo-name">Grupo Esquematiza</div>
+      <div class="logo-sub">Sistema 360°</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Principal</div>
+      <div class="nav-item active" onclick="showPage('dashboard',this)"><span class="nav-icon">⊞</span> Dashboard</div>
+      <div class="nav-item" onclick="showPage('alertas',this)"><span class="nav-icon">🔔</span> Alertas <span class="nav-badge">4</span></div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Financeiro</div>
+      <div class="nav-item" onclick="showPage('financeiro',this)"><span class="nav-icon">💰</span> Visão Geral</div>
+      <div class="nav-item" onclick="showPage('faturamento',this)"><span class="nav-icon">📄</span> Faturamento <span class="nav-badge green">2</span></div>
+      <div class="nav-item" onclick="showPage('contas-pagar',this)"><span class="nav-icon">📤</span> Contas a Pagar</div>
+      <div class="nav-item" onclick="showPage('contas-receber',this)"><span class="nav-icon">📥</span> Contas a Receber</div>
+      <div class="nav-item" onclick="showPage('fluxo-caixa',this)"><span class="nav-icon">📈</span> Fluxo de Caixa</div>
+      <div class="nav-item" onclick="showPage('dre',this)"><span class="nav-icon">📊</span> DRE</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Operações</div>
+      <div class="nav-item" onclick="showPage('escalas',this)"><span class="nav-icon">🗓</span> Escalas / Turnos</div>
+      <div class="nav-item" onclick="showPage('postos',this)"><span class="nav-icon">📍</span> Postos & Clientes</div>
+      <div class="nav-item" onclick="showPage('ocorrencias',this)"><span class="nav-icon">⚠️</span> Ocorrências <span class="nav-badge">1</span></div>
+      <div class="nav-item" onclick="showPage('rondas',this)"><span class="nav-icon">🔄</span> Rondas</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">RH & Pessoal</div>
+      <div class="nav-item" onclick="showPage('funcionarios',this)"><span class="nav-icon">👥</span> Funcionários</div>
+      <div class="nav-item" onclick="showPage('folha',this)"><span class="nav-icon">💼</span> Folha de Pagamento</div>
+      <div class="nav-item" onclick="showPage('ponto',this)"><span class="nav-icon">🕐</span> Controle de Ponto</div>
+      <div class="nav-item" onclick="showPage('treinamentos',this)"><span class="nav-icon">🎓</span> Treinamentos</div>
+      <div class="nav-item" onclick="showPage('documentos',this)"><span class="nav-icon">📎</span> Documentos</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Comercial</div>
+      <div class="nav-item" onclick="showPage('clientes',this)"><span class="nav-icon">🏢</span> Clientes</div>
+      <div class="nav-item" onclick="showPage('contratos',this)"><span class="nav-icon">📋</span> Contratos</div>
+      <div class="nav-item" onclick="showPage('propostas',this)"><span class="nav-icon">📩</span> Propostas</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Gestão</div>
+      <div class="nav-item" onclick="showPage('relatorios',this)"><span class="nav-icon">📑</span> Relatórios</div>
+      <div class="nav-item" onclick="showPage('configuracoes',this)"><span class="nav-icon">⚙️</span> Configurações</div>
+    </div>
+    <div class="user-area">
+      <div class="user-avatar">AD</div>
+      <div class="user-info">
+        <div class="user-name">Admin</div>
+        <div class="user-role">Gestor Geral</div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <div class="main" id="main">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="topbar">
+        <div>
+          <div class="topbar-title">Dashboard Geral</div>
+          <div class="topbar-subtitle">Quinta-feira, 19 de março de 2026</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <select class="form-select" style="width:auto;padding:7px 10px;font-size:12px;"><option>Março 2026</option><option>Fevereiro 2026</option></select>
+          <button class="btn btn-primary" onclick="openModal('modal-nova-tarefa')">+ Nova tarefa</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="kpi-grid">
+          <div class="kpi-card destaque" onclick="showPage('financeiro',null)">
+            <div class="kpi-icon green">💰</div>
+            <div class="kpi-label">Faturamento Mensal</div>
+            <div class="kpi-value">R$ 847K</div>
+            <div class="kpi-change up">▲ 12% vs mês anterior</div>
+          </div>
+          <div class="kpi-card" onclick="showPage('fluxo-caixa',null)">
+            <div class="kpi-icon green">📈</div>
+            <div class="kpi-label">Margem Operacional</div>
+            <div class="kpi-value">18,4%</div>
+            <div class="kpi-change up">▲ 2,1pp acima da meta</div>
+          </div>
+          <div class="kpi-card" onclick="showPage('funcionarios',null)">
+            <div class="kpi-icon blue">👥</div>
+            <div class="kpi-label">Funcionários Ativos</div>
+            <div class="kpi-value">258</div>
+            <div class="kpi-change neutral">3 admissões este mês</div>
+          </div>
+          <div class="kpi-card" onclick="showPage('postos',null)">
+            <div class="kpi-icon yellow">📍</div>
+            <div class="kpi-label">Postos Ativos</div>
+            <div class="kpi-value">34</div>
+            <div class="kpi-change up">▲ 2 novos contratos</div>
+          </div>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi-card" onclick="showPage('contas-receber',null)">
+            <div class="kpi-icon red">⚠️</div>
+            <div class="kpi-label">Inadimplência</div>
+            <div class="kpi-value">R$ 43K</div>
+            <div class="kpi-change down">▼ 3 faturas vencidas</div>
+          </div>
+          <div class="kpi-card" onclick="showPage('contas-pagar',null)">
+            <div class="kpi-icon yellow">📤</div>
+            <div class="kpi-label">A Pagar este mês</div>
+            <div class="kpi-value">R$ 692K</div>
+            <div class="kpi-change neutral">Vence em 8 dias (maior)</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon blue">🕐</div>
+            <div class="kpi-label">Absenteísmo</div>
+            <div class="kpi-value">2,8%</div>
+            <div class="kpi-change up">▲ Meta: abaixo de 4%</div>
+          </div>
+          <div class="kpi-card" onclick="showPage('ocorrencias',null)">
+            <div class="kpi-icon red">🚨</div>
+            <div class="kpi-label">Ocorrências Abertas</div>
+            <div class="kpi-value">1</div>
+            <div class="kpi-change down">Requer atenção</div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Faturamento — Últimos 6 meses</span>
+              <span class="card-action" onclick="showPage('faturamento',null)">Ver detalhes →</span>
+            </div>
+            <div class="chart-bars">
+              <div class="bar-wrap"><div class="bar" style="height:55px"></div><span class="bar-label">Out</span></div>
+              <div class="bar-wrap"><div class="bar" style="height:62px"></div><span class="bar-label">Nov</span></div>
+              <div class="bar-wrap"><div class="bar" style="height:75px"></div><span class="bar-label">Dez</span></div>
+              <div class="bar-wrap"><div class="bar" style="height:60px"></div><span class="bar-label">Jan</span></div>
+              <div class="bar-wrap"><div class="bar" style="height:65px"></div><span class="bar-label">Fev</span></div>
+              <div class="bar-wrap"><div class="bar active" style="height:80px"></div><span class="bar-label" style="color:var(--verde);font-weight:600">Mar</span></div>
+            </div>
+            <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--cinza-border);display:flex;justify-content:space-between;">
+              <span style="font-size:12px;color:var(--cinza-texto)">Total acumulado 2026</span>
+              <span style="font-size:13px;font-weight:700;color:var(--verde)">R$ 2.247.000</span>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Composição da Receita</span>
+              <span class="card-action" onclick="showPage('contratos',null)">Ver contratos →</span>
+            </div>
+            <div class="donut-wrap">
+              <svg width="90" height="90" viewBox="0 0 90 90">
+                <circle cx="45" cy="45" r="35" fill="none" stroke="#e8f5ed" stroke-width="14"/>
+                <circle cx="45" cy="45" r="35" fill="none" stroke="#1a4a2e" stroke-width="14" stroke-dasharray="131 88" stroke-dashoffset="0" stroke-linecap="round"/>
+                <circle cx="45" cy="45" r="35" fill="none" stroke="#2d7a4a" stroke-width="14" stroke-dasharray="66 153" stroke-dashoffset="-131" stroke-linecap="round"/>
+                <circle cx="45" cy="45" r="35" fill="none" stroke="#b8ddc5" stroke-width="14" stroke-dasharray="22 197" stroke-dashoffset="-197" stroke-linecap="round"/>
+                <text x="45" y="48" text-anchor="middle" font-size="13" font-weight="700" fill="#0f2a1a" font-family="Syne,sans-serif">100%</text>
+              </svg>
+              <div class="donut-legend">
+                <div class="legend-item"><div class="legend-dot" style="background:var(--verde)"></div><span style="flex:1;font-size:12px">Vigilância Armada</span><strong style="font-size:12px">60%</strong></div>
+                <div class="legend-item"><div class="legend-dot" style="background:var(--verde-claro)"></div><span style="flex:1;font-size:12px">Portaria / Recep.</span><strong style="font-size:12px">30%</strong></div>
+                <div class="legend-item"><div class="legend-dot" style="background:var(--verde-border)"></div><span style="flex:1;font-size:12px">Facilities</span><strong style="font-size:12px">10%</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Pendências & Alertas</span><span class="card-action" onclick="showPage('alertas',null)">Ver todos →</span></div>
+            <div class="alerta-row danger"><span class="alerta-icon">🚨</span><div class="alerta-texto"><strong>Fatura vencida</strong> — Posto Bradesco Ipanema · R$ 18.400</div><span class="alerta-data">Há 5 dias</span></div>
+            <div class="alerta-row warning"><span class="alerta-icon">⚠️</span><div class="alerta-texto"><strong>Documento expirando</strong> — Certificado SSP de 12 vigilantes</div><span class="alerta-data">Em 7 dias</span></div>
+            <div class="alerta-row warning"><span class="alerta-icon">🕐</span><div class="alerta-texto"><strong>Folha pendente</strong> — Aprovação da folha de Março 2026</div><span class="alerta-data">Hoje</span></div>
+            <div class="alerta-row info"><span class="alerta-icon">📋</span><div class="alerta-texto"><strong>Renovação contrato</strong> — Shopping Tijuca vence em 30 dias</div><span class="alerta-data">Em 30 dias</span></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Últimos Lançamentos</span><span class="card-action" onclick="showPage('fluxo-caixa',null)">Ver fluxo →</span></div>
+            <div class="timeline-item">
+              <div class="timeline-dot green"></div>
+              <div class="timeline-content"><div class="timeline-titulo">Recebimento — Condomínio Barra Sul</div><div class="timeline-subtitulo">R$ 24.800,00 · Referência Fevereiro</div></div>
+              <span class="timeline-hora">Hoje, 09:14</span>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot red"></div>
+              <div class="timeline-content"><div class="timeline-titulo">Pagamento — Unifardome (Uniformes)</div><div class="timeline-subtitulo">R$ 8.750,00 · NF 4521</div></div>
+              <span class="timeline-hora">Ontem, 14:32</span>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot green"></div>
+              <div class="timeline-content"><div class="timeline-titulo">Recebimento — Petrobras Duque</div><div class="timeline-subtitulo">R$ 62.000,00 · Contrato Principal</div></div>
+              <span class="timeline-hora">18/03, 10:00</span>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot yellow"></div>
+              <div class="timeline-content"><div class="timeline-titulo">Provisionamento — INSS Março</div><div class="timeline-subtitulo">R$ 48.320,00 · Vence 20/03</div></div>
+              <span class="timeline-hora">18/03, 08:00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FINANCEIRO -->
+    <div class="page" id="page-financeiro">
+      <div class="topbar"><div><div class="topbar-title">Financeiro — Visão Geral</div><div class="topbar-subtitle">Painel consolidado</div></div><div style="display:flex;gap:8px;"><button class="btn btn-ghost">⬇ Exportar</button><button class="btn btn-primary" onclick="openModal('modal-lancamento')">+ Lançamento</button></div></div>
+      <div class="content">
+        <div class="kpi-grid">
+          <div class="kpi-card destaque"><div class="kpi-icon green">💰</div><div class="kpi-label">Receita Bruta (Mar)</div><div class="kpi-value">R$ 847.200</div><div class="kpi-change up">▲ 12% vs Fev</div></div>
+          <div class="kpi-card"><div class="kpi-icon red">📤</div><div class="kpi-label">Despesas Totais</div><div class="kpi-value">R$ 691.800</div><div class="kpi-change down">▲ 8% vs Fev</div></div>
+          <div class="kpi-card"><div class="kpi-icon green">📊</div><div class="kpi-label">Lucro Operacional</div><div class="kpi-value">R$ 155.400</div><div class="kpi-change up">▲ Margem 18,4%</div></div>
+          <div class="kpi-card"><div class="kpi-icon blue">🏦</div><div class="kpi-label">Saldo em Caixa</div><div class="kpi-value">R$ 218.600</div><div class="kpi-change neutral">3 contas bancárias</div></div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Despesas por Centro de Custo</span></div>
+            <div class="progress-row"><div class="progress-info"><span class="progress-name">Mão de Obra (folha + encargos)</span><span class="progress-pct" style="color:var(--verde)">72%</span></div><div class="progress-bar"><div class="progress-fill" style="width:72%"></div></div></div>
+            <div class="progress-row"><div class="progress-info"><span class="progress-name">Equipamentos & Tecnologia</span><span class="progress-pct" style="color:var(--warning)">9%</span></div><div class="progress-bar"><div class="progress-fill yellow" style="width:9%"></div></div></div>
+            <div class="progress-row"><div class="progress-info"><span class="progress-name">Uniformes & EPI</span><span class="progress-pct">5%</span></div><div class="progress-bar"><div class="progress-fill" style="width:5%;background:var(--cinza-border)"></div></div></div>
+            <div class="progress-row"><div class="progress-info"><span class="progress-name">Impostos & Taxas</span><span class="progress-pct" style="color:var(--danger)">8%</span></div><div class="progress-bar"><div class="progress-fill red" style="width:8%"></div></div></div>
+            <div class="progress-row"><div class="progress-info"><span class="progress-name">Administrativo & Outros</span><span class="progress-pct">6%</span></div><div class="progress-bar"><div class="progress-fill" style="width:6%;background:var(--info)"></div></div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Indicadores Financeiros</span></div>
+            <div class="mini-stat"><span class="mini-stat-label">Receita por vigilante/mês</span><span class="mini-stat-value green">R$ 3.284</span></div>
+            <div class="mini-stat"><span class="mini-stat-label">Custo médio por vigilante/mês</span><span class="mini-stat-value">R$ 2.680</span></div>
+            <div class="mini-stat"><span class="mini-stat-label">Ticket médio por contrato</span><span class="mini-stat-value green">R$ 24.917</span></div>
+            <div class="mini-stat"><span class="mini-stat-label">Prazo médio recebimento</span><span class="mini-stat-value">28 dias</span></div>
+            <div class="mini-stat"><span class="mini-stat-label">Inadimplência (% receita)</span><span class="mini-stat-value red">5,1%</span></div>
+            <div class="mini-stat"><span class="mini-stat-label">Índice de Liquidez Corrente</span><span class="mini-stat-value green">1,42</span></div>
+            <div class="mini-stat"><span class="mini-stat-label">EBITDA</span><span class="mini-stat-value green">R$ 178.320</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Top Contratos por Receita</span></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>#</th><th>Cliente</th><th>Serviço</th><th>Funcionários</th><th>Valor/mês</th><th>Status</th><th>Vencimento</th></tr></thead>
+              <tbody>
+                <tr><td style="font-weight:600;color:var(--verde)">1</td><td><div style="display:flex;align-items:center;gap:8px;"><div class="avatar">PE</div>Petrobras Duque</div></td><td>Vigilância Armada</td><td>28</td><td><strong>R$ 92.400</strong></td><td><span class="badge badge-success">Ativo</span></td><td>Dez/2026</td></tr>
+                <tr><td style="font-weight:600;color:var(--verde)">2</td><td><div style="display:flex;align-items:center;gap:8px;"><div class="avatar">BB</div>Banco do Brasil RJ</div></td><td>Vigilância Armada</td><td>18</td><td><strong>R$ 64.800</strong></td><td><span class="badge badge-success">Ativo</span></td><td>Jun/2026</td></tr>
+                <tr><td style="font-weight:600;color:var(--verde)">3</td><td><div style="display:flex;align-items:center;gap:8px;"><div class="avatar">ST</div>Shopping Tijuca</div></td><td>Vigilância + Portaria</td><td>22</td><td><strong>R$ 58.200</strong></td><td><span class="badge badge-warning">Renovar</span></td><td>Abr/2026</td></tr>
+                <tr><td>4</td><td><div style="display:flex;align-items:center;gap:8px;"><div class="avatar">CS</div>Condomínio Barra Sul</div></td><td>Portaria 24h</td><td>12</td><td><strong>R$ 28.800</strong></td><td><span class="badge badge-success">Ativo</span></td><td>Out/2026</td></tr>
+                <tr><td>5</td><td><div style="display:flex;align-items:center;gap:8px;"><div class="avatar">BR</div>Bradesco Ipanema</div></td><td>Vigilância Armada</td><td>8</td><td><strong>R$ 24.800</strong></td><td><span class="badge badge-danger">Inadimpl.</span></td><td>Ago/2026</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FATURAMENTO -->
+    <div class="page" id="page-faturamento">
+      <div class="topbar"><div><div class="topbar-title">Faturamento</div><div class="topbar-subtitle">Notas fiscais e cobranças</div></div><div style="display:flex;gap:8px;"><button class="btn btn-ghost">⬇ Exportar XLSX</button><button class="btn btn-primary" onclick="openModal('modal-nf')">+ Emitir NF</button></div></div>
+      <div class="content">
+        <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
+          <div class="kpi-card"><div class="kpi-icon green">✅</div><div class="kpi-label">NFs Emitidas (Mar)</div><div class="kpi-value">34</div><div class="kpi-change up">R$ 847.200 total</div></div>
+          <div class="kpi-card"><div class="kpi-icon yellow">⏳</div><div class="kpi-label">Aguardando Aprovação</div><div class="kpi-value">2</div><div class="kpi-change neutral">R$ 47.200 pendente</div></div>
+          <div class="kpi-card"><div class="kpi-icon red">❌</div><div class="kpi-label">Devolvidas / Canceladas</div><div class="kpi-value">1</div><div class="kpi-change down">R$ 4.800</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Notas Fiscais — Março 2026</span></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>NF</th><th>Cliente</th><th>Emissão</th><th>Vencimento</th><th>Valor</th><th>Status</th><th>Ação</th></tr></thead>
+              <tbody>
+                <tr><td><strong>NF-3241</strong></td><td>Petrobras Duque</td><td>01/03/2026</td><td>31/03/2026</td><td><strong>R$ 92.400</strong></td><td><span class="badge badge-success">Emitida</span></td><td><button class="btn btn-ghost" style="padding:4px 10px;font-size:11px">Ver</button></td></tr>
+                <tr><td><strong>NF-3242</strong></td><td>Banco do Brasil RJ</td><td>01/03/2026</td><td>31/03/2026</td><td><strong>R$ 64.800</strong></td><td><span class="badge badge-success">Emitida</span></td><td><button class="btn btn-ghost" style="padding:4px 10px;font-size:11px">Ver</button></td></tr>
+                <tr><td><strong>NF-3243</strong></td><td>Shopping Tijuca</td><td>01/03/2026</td><td>31/03/2026</td><td><strong>R$ 58.200</strong></td><td><span class="badge badge-warning">Pendente</span></td><td><button class="btn btn-ghost" style="padding:4px 10px;font-size:11px">Ver</button></td></tr>
+                <tr><td><strong>NF-3220</strong></td><td>Bradesco Ipanema</td><td>01/02/2026</td><td>28/02/2026</td><td><strong>R$ 18.400</strong></td><td><span class="badge badge-danger">Vencida</span></td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px;color:var(--danger);border-color:var(--danger)">Cobrar</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTAS A PAGAR -->
+    <div class="page" id="page-contas-pagar">
+      <div class="topbar"><div><div class="topbar-title">Contas a Pagar</div><div class="topbar-subtitle">Gestão de obrigações financeiras</div></div><button class="btn btn-primary" onclick="openModal('modal-lancamento')">+ Nova Conta</button></div>
+      <div class="content">
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-icon red">🔴</div><div class="kpi-label">Vencidas</div><div class="kpi-value">R$ 12.400</div><div class="kpi-change down">2 contas</div></div>
+          <div class="kpi-card destaque"><div class="kpi-icon yellow">🟡</div><div class="kpi-label">Vence esta semana</div><div class="kpi-value">R$ 68.320</div><div class="kpi-change neutral">INSS + FGTS</div></div>
+          <div class="kpi-card"><div class="kpi-icon green">🟢</div><div class="kpi-label">Vence este mês</div><div class="kpi-value">R$ 610.900</div><div class="kpi-change neutral">28 lançamentos</div></div>
+          <div class="kpi-card"><div class="kpi-icon blue">✅</div><div class="kpi-label">Pagas (Mar)</div><div class="kpi-value">R$ 186.200</div><div class="kpi-change up">18 liquidadas</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Calendário de Vencimentos — Março 2026</span></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Fornecedor / Descrição</th><th>Categoria</th><th>Vencimento</th><th>Valor</th><th>Status</th><th>Ação</th></tr></thead>
+              <tbody>
+                <tr><td><strong>INSS + FGTS — Março</strong></td><td>Encargos</td><td><span style="color:var(--danger);font-weight:600">20/03</span></td><td><strong>R$ 48.320</strong></td><td><span class="badge badge-warning">Pendente</span></td><td><button class="btn btn-primary" style="padding:4px 12px;font-size:11px">Pagar</button></td></tr>
+                <tr><td>Unifardome — Uniformes lote 03</td><td>Material</td><td>22/03</td><td>R$ 8.750</td><td><span class="badge badge-warning">Pendente</span></td><td><button class="btn btn-outline" style="padding:4px 12px;font-size:11px">Pagar</button></td></tr>
+                <tr><td>TecnoSegur — Manutenção equipamentos</td><td>Manutenção</td><td>25/03</td><td>R$ 12.400</td><td><span class="badge badge-warning">Pendente</span></td><td><button class="btn btn-outline" style="padding:4px 12px;font-size:11px">Pagar</button></td></tr>
+                <tr><td style="color:var(--danger)"><strong>Seguro de Responsabilidade Civil</strong></td><td>Seguro</td><td><span style="color:var(--danger);font-weight:600">Vencida 10/03</span></td><td><strong>R$ 12.400</strong></td><td><span class="badge badge-danger">Vencida</span></td><td><button class="btn btn-primary" style="padding:4px 12px;font-size:11px;background:var(--danger)">Urgente</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTAS A RECEBER -->
+    <div class="page" id="page-contas-receber">
+      <div class="topbar"><div><div class="topbar-title">Contas a Receber</div><div class="topbar-subtitle">Inadimplência e cobrança</div></div><button class="btn btn-primary">+ Registrar Recebimento</button></div>
+      <div class="content">
+        <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
+          <div class="kpi-card destaque"><div class="kpi-icon green">📥</div><div class="kpi-label">A Receber (Mar)</div><div class="kpi-value">R$ 847.200</div><div class="kpi-change neutral">34 faturas</div></div>
+          <div class="kpi-card"><div class="kpi-icon red">⚠️</div><div class="kpi-label">Em Atraso</div><div class="kpi-value">R$ 43.200</div><div class="kpi-change down">3 clientes</div></div>
+          <div class="kpi-card"><div class="kpi-icon green">✅</div><div class="kpi-label">Recebido (Mar)</div><div class="kpi-value">R$ 604.200</div><div class="kpi-change up">71% do previsto</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Inadimplência por Cliente</span></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Cliente</th><th>Referência</th><th>Vencimento</th><th>Dias em Atraso</th><th>Valor</th><th>Ação</th></tr></thead>
+              <tbody>
+                <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="avatar">BR</div>Bradesco Ipanema</div></td><td>Fevereiro/2026</td><td>28/02/2026</td><td><span style="color:var(--danger);font-weight:700">19 dias</span></td><td><strong style="color:var(--danger)">R$ 18.400</strong></td><td><button class="btn btn-primary" style="padding:4px 12px;font-size:11px;background:var(--danger)">Cobrar</button></td></tr>
+                <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="avatar">CM</div>Cond. Mar Azul</div></td><td>Fevereiro/2026</td><td>10/03/2026</td><td><span style="color:var(--warning);font-weight:700">9 dias</span></td><td><strong style="color:var(--warning)">R$ 14.800</strong></td><td><button class="btn btn-outline" style="padding:4px 12px;font-size:11px">Cobrar</button></td></tr>
+                <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="avatar">HP</div>Hotel Porto Real</div></td><td>Março/2026</td><td>15/03/2026</td><td><span style="color:var(--warning);font-weight:700">4 dias</span></td><td><strong>R$ 10.000</strong></td><td><button class="btn btn-ghost" style="padding:4px 12px;font-size:11px">Aguardar</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FLUXO DE CAIXA -->
+    <div class="page" id="page-fluxo-caixa">
+      <div class="topbar"><div><div class="topbar-title">Fluxo de Caixa</div><div class="topbar-subtitle">Entradas e saídas detalhadas</div></div><button class="btn btn-ghost">⬇ Exportar PDF</button></div>
+      <div class="content">
+        <div class="kpi-grid" style="grid-template-columns:repeat(3,1fr)">
+          <div class="kpi-card"><div class="kpi-icon green">📈</div><div class="kpi-label">Entradas (Mar)</div><div class="kpi-value">R$ 604.200</div><div class="kpi-change up">Recebidos até hoje</div></div>
+          <div class="kpi-card"><div class="kpi-icon red">📉</div><div class="kpi-label">Saídas (Mar)</div><div class="kpi-value">R$ 420.100</div><div class="kpi-change down">Pagos até hoje</div></div>
+          <div class="kpi-card destaque"><div class="kpi-icon green">🏦</div><div class="kpi-label">Saldo Líquido</div><div class="kpi-value">R$ 184.100</div><div class="kpi-change up">Positivo ▲</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Extrato Detalhado — Março 2026</span></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Data</th><th>Descrição</th><th>Tipo</th><th>Categoria</th><th>Valor</th><th>Saldo</th></tr></thead>
+              <tbody>
+                <tr><td>19/03</td><td>Receb. Condomínio Barra Sul</td><td><span class="badge badge-success">Entrada</span></td><td>Serviço prestado</td><td style="color:var(--success);font-weight:600">+R$ 24.800</td><td><strong>R$ 218.600</strong></td></tr>
+                <tr><td>18/03</td><td>Pagto. Unifardome</td><td><span class="badge badge-danger">Saída</span></td><td>Material</td><td style="color:var(--danger);font-weight:600">-R$ 8.750</td><td>R$ 193.800</td></tr>
+                <tr><td>18/03</td><td>Receb. Petrobras Duque</td><td><span class="badge badge-success">Entrada</span></td><td>Serviço prestado</td><td style="color:var(--success);font-weight:600">+R$ 62.000</td><td>R$ 202.550</td></tr>
+                <tr><td>15/03</td><td>Pagto. Plano de Saúde — 258 func.</td><td><span class="badge badge-danger">Saída</span></td><td>Benefícios RH</td><td style="color:var(--danger);font-weight:600">-R$ 38.700</td><td>R$ 140.550</td></tr>
+                <tr><td>10/03</td><td>Receb. Banco do Brasil RJ</td><td><span class="badge badge-success">Entrada</span></td><td>Serviço prestado</td><td style="color:var(--success);font-weight:600">+R$ 64.800</td><td>R$ 179.250</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DRE -->
+    <div class="page" id="page-dre">
+      <div class="topbar"><div><div class="topbar-title">DRE — Demonstração de Resultado</div><div class="topbar-subtitle">Gerencial simplificado</div></div><div style="display:flex;gap:8px;"><select class="form-select" style="width:auto;padding:7px 10px;font-size:12px;"><option>Março 2026</option><option>Fevereiro 2026</option><option>1º Tri 2026</option></select><button class="btn btn-ghost">⬇ Exportar</button></div></div>
+      <div class="content">
+        <div class="card" style="max-width:680px;">
+          <div class="card-header"><span class="card-title">DRE Gerencial — Março 2026</span></div>
+          <table style="width:100%;font-size:13px;">
+            <tbody>
+              <tr style="background:var(--verde-bg)"><td style="padding:10px 12px;font-weight:700;color:var(--verde)">RECEITA BRUTA DE SERVIÇOS</td><td style="padding:10px 12px;text-align:right;font-weight:700;color:var(--verde)">R$ 847.200</td><td style="padding:10px 12px;text-align:right;color:var(--cinza-texto)">100%</td></tr>
+              <tr><td style="padding:8px 12px;padding-left:24px;color:var(--cinza-texto)">(-) Impostos sobre serviço</td><td style="padding:8px 12px;text-align:right;color:var(--danger)">- R$ 67.776</td><td style="padding:8px 12px;text-align:right;color:var(--cinza-texto)">-8%</td></tr>
+              <tr style="border-top:1px solid var(--cinza-border);background:var(--cinza-bg)"><td style="padding:10px 12px;font-weight:600">RECEITA LÍQUIDA</td><td style="padding:10px 12px;text-align:right;font-weight:600">R$ 779.424</td><td style="padding:10px 12px;text-align:right;color:var(--cinza-texto)">92%</td></tr>
+              <tr><td style="padding:8px 12px;padding-left:24px;color:var(--cinza-texto)">(-) Custo Mão de Obra</td><td style="padding:8px 12px;text-align:right;color:var(--danger)">- R$ 498.096</td><td style="padding:8px 12px;text-align:right;color:var(--cinza-texto)">-59%</td></tr>
+              <tr><td style="padding:8px 12px;padding-left:24px;color:var(--cinza-texto)">(-) Uniformes, EPI e Equipamentos</td><td style="padding:8px 12px;text-align:right;color:var(--danger)">- R$ 33.888</td><td style="padding:8px 12px;text-align:right;color:var(--cinza-texto)">-4%</td></tr>
+              <tr style="border-top:1px solid var(--cinza-border);background:var(--cinza-bg)"><td style="padding:10px 12px;font-weight:600">LUCRO BRUTO</td><td style="padding:10px 12px;text-align:right;font-weight:600">R$ 247.440</td><td style="padding:10px 12px;text-align:right;color:var(--cinza-texto)">29%</td></tr>
+              <tr><td style="padding:8px 12px;padding-left:24px;color:var(--cinza-texto)">(-) Despesas Administrativas</td><td style="padding:8px 12px;text-align:right;color:var(--danger)">- R$ 42.360</td><td style="padding:8px 12px;text-align:right;color:var(--cinza-texto)">-5%</td></tr>
+              <tr><td style="padding:8px 12px;padding-left:24px;color:var(--cinza-texto)">(-) Despesas Comerciais</td><td style="padding:8px 12px;text-align:right;color:var(--danger)">- R$ 16.944</td><td style="padding:8px 12px;text-align:right;color:var(--cinza-texto)">-2%</td></tr>
+              <tr><td style="padding:8px 12px;padding-left:24px;color:var(--cinza-texto)">(-) Aluguel e Infraestrutura</td><td style="padding:8px 12px;text-align:right;color:var(--danger)">- R$ 12.708</td><td style="padding:8px 12px;text-align:right;color:var(--cinza-texto)">-1,5%</td></tr>
+              <tr style="border-top:1px solid var(--cinza-border);background:var(--verde-bg)"><td style="padding:10px 12px;font-weight:700;color:var(--verde)">EBITDA</td><td style="padding:10px 12px;text-align:right;font-weight:700;color:var(--verde)">R$ 178.320</td><td style="padding:10px 12px;text-align:right;color:var(--verde)">21%</td></tr>
+              <tr><td style="padding:8px 12px;padding-left:24px;color:var(--cinza-texto)">(-) Depreciação e Amortização</td><td style="padding:8px 12px;text-align:right;color:var(--danger)">- R$ 22.920</td><td style="padding:8px 12px;text-align:right;color:var(--cinza-texto)">-2,7%</td></tr>
+              <tr style="border-top:2px solid var(--verde);background:var(--verde)"><td style="padding:12px;font-weight:700;color:#fff;font-family:Syne,sans-serif;font-size:14px">LUCRO LÍQUIDO</td><td style="padding:12px;text-align:right;font-weight:700;color:#fff;font-size:14px;font-family:Syne,sans-serif">R$ 157.500</td><td style="padding:12px;text-align:right;color:rgba(255,255,255,0.7)">18,6%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- FUNCIONÁRIOS -->
+    <div class="page" id="page-funcionarios">
+      <div class="topbar"><div><div class="topbar-title">Funcionários</div><div class="topbar-subtitle">258 colaboradores ativos</div></div><div style="display:flex;gap:8px;"><div class="search-bar" style="width:220px;"><span style="color:var(--cinza-texto);font-size:13px">🔍</span><input placeholder="Buscar funcionário..."></div><button class="btn btn-primary" onclick="openModal('modal-funcionario')">+ Admitir</button></div></div>
+      <div class="content">
+        <div class="kpi-grid">
+          <div class="kpi-card"><div class="kpi-icon green">👥</div><div class="kpi-label">Total Ativos</div><div class="kpi-value">258</div><div class="kpi-change neutral">+3 este mês</div></div>
+          <div class="kpi-card"><div class="kpi-icon blue">🎓</div><div class="kpi-label">Vigilantes Armados</div><div class="kpi-value">194</div><div class="kpi-change neutral">75% do efetivo</div></div>
+          <div class="kpi-card"><div class="kpi-icon yellow">⚠️</div><div class="kpi-label">Doc. Vencendo (30d)</div><div class="kpi-value">12</div><div class="kpi-change down">Cert. SSP expirando</div></div>
+          <div class="kpi-card"><div class="kpi-icon red">📋</div><div class="kpi-label">Em Processo</div><div class="kpi-value">5</div><div class="kpi-change neutral">Admissões / Deslig.</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Lista de Funcionários</span></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Nome</th><th>Cargo</th><th>Posto</th><th>Admissão</th><th>Salário</th><th>Status</th><th>Ação</th></tr></thead>
+              <tbody>
+                <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="avatar">JS</div>João Silva</div></td><td>Vigilante Armado</td><td>Petrobras Duque</td><td>12/03/2021</td><td>R$ 2.840</td><td><span class="badge badge-success">Ativo</span></td><td><button class="btn btn-ghost" style="padding:4px 10px;font-size:11px">Ver perfil</button></td></tr>
+                <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="avatar">MO</div>Maria Oliveira</div></td><td>Supervisora</td><td>Regional RJ Sul</td><td>08/07/2019</td><td>R$ 4.200</td><td><span class="badge badge-success">Ativo</span></td><td><button class="btn btn-ghost" style="padding:4px 10px;font-size:11px">Ver perfil</button></td></tr>
+                <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="avatar">PC</div>Paulo Costa</div></td><td>Vigilante Armado</td><td>Banco do Brasil RJ</td><td>22/01/2022</td><td>R$ 2.840</td><td><span class="badge badge-warning">Doc. vencendo</span></td><td><button class="btn btn-outline" style="padding:4px 10px;font-size:11px">Regularizar</button></td></tr>
+                <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="avatar">AR</div>Ana Rodrigues</div></td><td>Porteira</td><td>Cond. Barra Sul</td><td>15/05/2023</td><td>R$ 1.980</td><td><span class="badge badge-success">Ativo</span></td><td><button class="btn btn-ghost" style="padding:4px 10px;font-size:11px">Ver perfil</button></td></tr>
+                <tr><td><div style="display:flex;align-items:center;gap:8px;"><div class="avatar">RL</div>Roberto Lima</div></td><td>Vigilante Armado</td><td>Shopping Tijuca</td><td>03/11/2020</td><td>R$ 2.840</td><td><span class="badge badge-info">Férias</span></td><td><button class="btn btn-ghost" style="padding:4px 10px;font-size:11px">Ver perfil</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOLHA -->
+    <div class="page" id="page-folha">
+      <div class="topbar"><div><div class="topbar-title">Folha de Pagamento</div><div class="topbar-subtitle">Processamento e aprovação</div></div><div style="display:flex;gap:8px;"><button class="btn btn-ghost">⬇ Exportar SEFIP</button><button class="btn btn-primary">✓ Aprovar Folha</button></div></div>
+      <div class="content">
+        <div class="alerta-row warning" style="margin-bottom:16px;border:1px solid var(--warning)"><span class="alerta-icon">⚠️</span><div class="alerta-texto"><strong>Folha de Março/2026 aguarda aprovação.</strong> Prazo limite: 25/03/2026</div><button class="btn btn-primary" style="white-space:nowrap">Revisar e Aprovar</button></div>
+        <div class="kpi-grid">
+          <div class="kpi-card destaque"><div class="kpi-icon green">👥</div><div class="kpi-label">Funcionários</div><div class="kpi-value">258</div></div>
+          <div class="kpi-card"><div class="kpi-icon red">💰</div><div class="kpi-label">Total Bruto</div><div class="kpi-value">R$ 612.480</div></div>
+          <div class="kpi-card"><div class="kpi-icon yellow">📤</div><div class="kpi-label">Encargos Totais</div><div class="kpi-value">R$ 183.744</div></div>
+          <div class="kpi-card"><div class="kpi-icon green">🏦</div><div class="kpi-label">Líquido a Pagar</div><div class="kpi-value">R$ 498.096</div><div class="kpi-change up">Crédito dia 05/04</div></div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Composição da Folha</span></div>
+            <div class="mini-stat"><span class="mini-stat-label">Salários base</span><span class="mini-stat-value">R$ 498.096</span></div>
+            <div class="mini-stat"><span class="mini-stat-label">Horas extras</span><span class="mini-stat-value">R$ 28.400</span></div>
+            <div class="mini-stat"><span class="mini-stat-label">Adicional noturno</span><span class="mini-stat-value">R$ 42.860</span></div>
+            <div class="mini-stat"><span class="mini-stat-label">Vale transporte</span><span class="mini-stat-value">R$ 18.420</span></div>
+            <div class="mini-stat"><span class="mini-stat-label">INSS (20%)</span><span class="mini-stat-value red">R$ 99.619</span></div>
+            <div class="mini-stat"><span class="mini-stat-label">FGTS (8%)</span><span class="mini-stat-value red">R$ 48.986</span></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Efetivo por Setor</span></div>
+            <div class="progress-row"><div class="progress-info"><span class="progress-name">Vigilância Armada (194)</span><span class="progress-pct">75%</span></div><div class="progress-bar"><div class="progress-fill" style="width:75%"></div></div></div>
+            <div class="progress-row"><div class="progress-info"><span class="progress-name">Portaria / Recepção (38)</span><span class="progress-pct">15%</span></div><div class="progress-bar"><div class="progress-fill" style="width:15%;background:var(--verde-claro)"></div></div></div>
+            <div class="progress-row"><div class="progress-info"><span class="progress-name">Supervisão (14)</span><span class="progress-pct">5%</span></div><div class="progress-bar"><div class="progress-fill" style="width:5%;background:var(--warning)"></div></div></div>
+            <div class="progress-row"><div class="progress-info"><span class="progress-name">Administrativo (12)</span><span class="progress-pct">5%</span></div><div class="progress-bar"><div class="progress-fill" style="width:5%;background:var(--info)"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLACEHOLDERS -->
+    <div class="page" id="page-escalas"><div class="topbar"><div><div class="topbar-title">Escalas & Turnos</div></div><button class="btn btn-primary">+ Nova Escala</button></div><div class="content"><div class="card"><div class="empty-state"><div class="empty-icon">🗓</div><div class="empty-title">Módulo de Escalas</div><div class="empty-desc">Gerencie turnos de 12x36, 12x12, fixo diurno/noturno. Vincule vigilantes por posto e gere escalas automáticas.</div><br><button class="btn btn-primary" style="margin:0 auto;display:flex">Criar primeira escala →</button></div></div></div></div>
+    <div class="page" id="page-postos"><div class="topbar"><div><div class="topbar-title">Postos & Clientes</div><div class="topbar-subtitle">34 postos ativos</div></div><button class="btn btn-primary">+ Novo Posto</button></div><div class="content"><div class="card"><div class="empty-state"><div class="empty-icon">📍</div><div class="empty-title">Gestão de Postos</div><div class="empty-desc">Cadastre postos de serviço, vincule contratos, aloque vigilantes e monitore a cobertura por cliente.</div></div></div></div></div>
+    <div class="page" id="page-ocorrencias">
+      <div class="topbar"><div><div class="topbar-title">Ocorrências</div><div class="topbar-subtitle">1 ocorrência aberta</div></div><button class="btn btn-primary">+ Registrar</button></div>
+      <div class="content"><div class="alerta-row danger" style="margin-bottom:16px;border:1px solid var(--danger)"><span class="alerta-icon">🚨</span><div class="alerta-texto"><strong>OCORRÊNCIA ABERTA</strong> — Furto em área restrita · Shopping Tijuca · Vigilante: Carlos Nunes</div><button class="btn btn-primary" style="background:var(--danger);white-space:nowrap">Ver detalhes</button></div><div class="card"><div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Relatório de Ocorrências</div><div class="empty-desc">Registre, acompanhe e arquive ocorrências. Histórico por posto, funcionário e tipo de incidente.</div></div></div></div>
+    </div>
+    <div class="page" id="page-rondas"><div class="topbar"><div><div class="topbar-title">Rondas</div></div><button class="btn btn-primary">+ Nova Ronda</button></div><div class="content"><div class="card"><div class="empty-state"><div class="empty-icon">🔄</div><div class="empty-title">Controle de Rondas</div><div class="empty-desc">Pontos de verificação por QR code ou NFC. Relatórios automáticos de conformidade por posto.</div></div></div></div></div>
+    <div class="page" id="page-ponto"><div class="topbar"><div><div class="topbar-title">Controle de Ponto</div></div><button class="btn btn-primary">+ Ajuste Manual</button></div><div class="content"><div class="card"><div class="empty-state"><div class="empty-icon">🕐</div><div class="empty-title">Ponto Eletrônico</div><div class="empty-desc">App mobile para batida de ponto geolocalizada. Banco de horas e escalas integrados.</div></div></div></div></div>
+    <div class="page" id="page-treinamentos"><div class="topbar"><div><div class="topbar-title">Treinamentos</div></div><button class="btn btn-primary">+ Novo Treinamento</button></div><div class="content"><div class="card"><div class="empty-state"><div class="empty-icon">🎓</div><div class="empty-title">Módulo de Treinamentos</div><div class="empty-desc">Cursos obrigatórios, renovações de certificado SSP, NR20 e controle de vencimentos automáticos.</div></div></div></div></div>
+    <div class="page" id="page-documentos"><div class="topbar"><div><div class="topbar-title">Documentos</div></div><button class="btn btn-primary">+ Upload</button></div><div class="content"><div class="card"><div class="empty-state"><div class="empty-icon">📎</div><div class="empty-title">Gestão Documental</div><div class="empty-desc">Armazene CNH, certificados SSP, carteiras de vigilante, laudos e contratos. Alertas automáticos.</div></div></div></div></div>
+    <div class="page" id="page-clientes"><div class="topbar"><div><div class="topbar-title">Clientes</div></div><button class="btn btn-primary">+ Novo Cliente</button></div><div class="content"><div class="card"><div class="empty-state"><div class="empty-icon">🏢</div><div class="empty-title">CRM — Carteira de Clientes</div><div class="empty-desc">Histórico de contratos, visitas, NPS e pipeline de renovação.</div></div></div></div></div>
+    <div class="page" id="page-contratos"><div class="topbar"><div><div class="topbar-title">Contratos</div><div class="topbar-subtitle">34 contratos ativos</div></div><button class="btn btn-primary">+ Novo Contrato</button></div><div class="content"><div class="card"><div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Gestão de Contratos</div><div class="empty-desc">Renovações, reajustes, aditivos e vigência. Alertas 60 dias antes do vencimento.</div></div></div></div></div>
+    <div class="page" id="page-propostas"><div class="topbar"><div><div class="topbar-title">Propostas Comerciais</div></div><button class="btn btn-primary">+ Nova Proposta</button></div><div class="content"><div class="card"><div class="empty-state"><div class="empty-icon">📩</div><div class="empty-title">Gerador de Propostas</div><div class="empty-desc">Propostas com precificação automática baseada em tabela salarial, encargos e margem configurável.</div></div></div></div></div>
+    <div class="page" id="page-alertas">
+      <div class="topbar"><div><div class="topbar-title">Central de Alertas</div><div class="topbar-subtitle">4 pendências ativas</div></div></div>
+      <div class="content"><div class="card"><div class="card-header"><span class="card-title">Alertas Críticos</span></div>
+        <div class="alerta-row danger"><span class="alerta-icon">🚨</span><div class="alerta-texto"><strong>Fatura vencida há 19 dias</strong> — Bradesco Ipanema · R$ 18.400</div><span class="alerta-data">Crítico</span></div>
+        <div class="alerta-row danger"><span class="alerta-icon">📋</span><div class="alerta-texto"><strong>Seguro RC vencido há 9 dias</strong> — Apólice nº 8842-X · Irregularidade legal</div><span class="alerta-data">Urgente</span></div>
+        <div class="alerta-row warning"><span class="alerta-icon">🎓</span><div class="alerta-texto"><strong>12 certificados SSP vencem em 7 dias</strong> — Ver lista detalhada</div><span class="alerta-data">Em 7 dias</span></div>
+        <div class="alerta-row warning"><span class="alerta-icon">💼</span><div class="alerta-texto"><strong>Folha de Março pendente de aprovação</strong> — Prazo: 25/03/2026</div><span class="alerta-data">Hoje</span></div>
+        <div class="alerta-row info"><span class="alerta-icon">📋</span><div class="alerta-texto"><strong>Contrato Shopping Tijuca vence em 30 dias</strong> — R$ 58.200/mês</div><span class="alerta-data">Em 30 dias</span></div>
+      </div></div>
+    </div>
+    <div class="page" id="page-relatorios"><div class="topbar"><div><div class="topbar-title">Relatórios</div></div></div><div class="content"><div class="grid-3"><div class="card" style="cursor:pointer;text-align:center;padding:28px 20px;" onclick="showPage('dre',null)"><div style="font-size:28px;margin-bottom:8px">📊</div><div style="font-weight:600;font-size:14px;margin-bottom:4px">DRE Mensal</div><div style="font-size:12px;color:var(--cinza-texto)">Resultado gerencial</div></div><div class="card" style="cursor:pointer;text-align:center;padding:28px 20px;" onclick="showPage('fluxo-caixa',null)"><div style="font-size:28px;margin-bottom:8px">📈</div><div style="font-weight:600;font-size:14px;margin-bottom:4px">Fluxo de Caixa</div><div style="font-size:12px;color:var(--cinza-texto)">Entradas e saídas</div></div><div class="card" style="cursor:pointer;text-align:center;padding:28px 20px;"><div style="font-size:28px;margin-bottom:8px">👥</div><div style="font-weight:600;font-size:14px;margin-bottom:4px">Relatório de RH</div><div style="font-size:12px;color:var(--cinza-texto)">Efetivo e turnover</div></div><div class="card" style="cursor:pointer;text-align:center;padding:28px 20px;"><div style="font-size:28px;margin-bottom:8px">📍</div><div style="font-weight:600;font-size:14px;margin-bottom:4px">Relatório de Postos</div><div style="font-size:12px;color:var(--cinza-texto)">Cobertura e conformidade</div></div><div class="card" style="cursor:pointer;text-align:center;padding:28px 20px;"><div style="font-size:28px;margin-bottom:8px">⚠️</div><div style="font-weight:600;font-size:14px;margin-bottom:4px">Ocorrências</div><div style="font-size:12px;color:var(--cinza-texto)">Histórico e estatísticas</div></div><div class="card" style="cursor:pointer;text-align:center;padding:28px 20px;"><div style="font-size:28px;margin-bottom:8px">📋</div><div style="font-weight:600;font-size:14px;margin-bottom:4px">Relatório Fiscal</div><div style="font-size:12px;color:var(--cinza-texto)">NFs e obrigações</div></div></div></div></div>
+    <div class="page" id="page-configuracoes">
+      <div class="topbar"><div><div class="topbar-title">Configurações do Sistema</div></div></div>
+      <div class="content"><div class="grid-2">
+        <div class="card"><div class="card-header"><span class="card-title">Empresa</span></div>
+          <div class="form-group"><label class="form-label">Razão Social</label><input class="form-input" value="Grupo Esquematiza Segurança Ltda"></div>
+          <div class="form-row"><div class="form-group"><label class="form-label">CNPJ</label><input class="form-input" value="XX.XXX.XXX/0001-XX"></div><div class="form-group"><label class="form-label">Registro SSP</label><input class="form-input" value="SSP-RJ-XXXX"></div></div>
+          <button class="btn btn-primary">Salvar alterações</button>
+        </div>
+        <div class="card"><div class="card-header"><span class="card-title">Notificações & Alertas</span></div>
+          <div class="switch-row"><div><div class="switch-label">Alerta de inadimplência</div><div class="switch-desc">Notificar quando fatura vencer</div></div><div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="switch-row"><div><div class="switch-label">Documentos vencendo</div><div class="switch-desc">Avisar 30 dias antes</div></div><div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="switch-row"><div><div class="switch-label">Aprovação de folha</div><div class="switch-desc">Lembrete 5 dias antes</div></div><div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="switch-row"><div><div class="switch-label">Renovação de contratos</div><div class="switch-desc">Alertar 60 dias antes</div></div><div class="switch on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="switch-row"><div><div class="switch-label">DRE automático</div><div class="switch-desc">Enviar todo dia 1º do mês</div></div><div class="switch" onclick="this.classList.toggle('on')"></div></div>
+        </div>
+      </div></div>
+    </div>
+
+  </div><!-- /main -->
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-lancamento">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Novo Lançamento Financeiro</span><span class="modal-close" onclick="closeModal('modal-lancamento')">✕</span></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Tipo</label><select class="form-select"><option>Entrada (Recebimento)</option><option>Saída (Pagamento)</option><option>Transferência</option></select></div>
+      <div class="form-group"><label class="form-label">Descrição</label><input class="form-input" placeholder="Ex: Pagamento NF 3241 — Petrobras"></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Valor (R$)</label><input class="form-input" placeholder="0,00"></div><div class="form-group"><label class="form-label">Data</label><input class="form-input" type="date"></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Categoria</label><select class="form-select"><option>Serviço prestado</option><option>Folha de pagamento</option><option>Encargos</option><option>Material</option><option>Outros</option></select></div><div class="form-group"><label class="form-label">Conta Bancária</label><select class="form-select"><option>C/C Bradesco Empresas</option><option>C/C Itaú</option><option>Caixa Interno</option></select></div></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-lancamento')">Cancelar</button><button class="btn btn-primary" onclick="closeModal('modal-lancamento')">Salvar Lançamento</button></div>
+  </div>
+</div>
+<div class="modal-overlay" id="modal-nf">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Emitir Nota Fiscal</span><span class="modal-close" onclick="closeModal('modal-nf')">✕</span></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Cliente</label><select class="form-select"><option>Petrobras Duque de Caxias</option><option>Banco do Brasil RJ</option><option>Shopping Tijuca</option></select></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Competência</label><input class="form-input" value="Março/2026"></div><div class="form-group"><label class="form-label">Vencimento</label><input class="form-input" type="date"></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Valor (R$)</label><input class="form-input" placeholder="0,00"></div><div class="form-group"><label class="form-label">Serviço (CNAE)</label><select class="form-select"><option>8011-1 — Vigilância</option><option>8012-9 — Transporte de Valores</option></select></div></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-nf')">Cancelar</button><button class="btn btn-primary" onclick="closeModal('modal-nf')">Emitir NF</button></div>
+  </div>
+</div>
+<div class="modal-overlay" id="modal-funcionario">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Admitir Funcionário</span><span class="modal-close" onclick="closeModal('modal-funcionario')">✕</span></div>
+    <div class="modal-body">
+      <div class="form-row"><div class="form-group"><label class="form-label">Nome Completo</label><input class="form-input"></div><div class="form-group"><label class="form-label">CPF</label><input class="form-input" placeholder="000.000.000-00"></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Cargo</label><select class="form-select"><option>Vigilante Armado</option><option>Supervisor</option><option>Porteiro</option><option>Administrativo</option></select></div><div class="form-group"><label class="form-label">Data Admissão</label><input class="form-input" type="date"></div></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Salário (R$)</label><input class="form-input" placeholder="2.840,00"></div><div class="form-group"><label class="form-label">Posto</label><select class="form-select"><option>Petrobras Duque</option><option>Banco do Brasil RJ</option><option>Shopping Tijuca</option></select></div></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-funcionario')">Cancelar</button><button class="btn btn-primary" onclick="closeModal('modal-funcionario')">Admitir</button></div>
+  </div>
+</div>
+<div class="modal-overlay" id="modal-nova-tarefa">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Nova Tarefa</span><span class="modal-close" onclick="closeModal('modal-nova-tarefa')">✕</span></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Título</label><input class="form-input" placeholder="Ex: Ligar para cliente Bradesco"></div>
+      <div class="form-row"><div class="form-group"><label class="form-label">Responsável</label><select class="form-select"><option>Admin</option><option>Comercial</option><option>RH</option><option>Financeiro</option></select></div><div class="form-group"><label class="form-label">Prazo</label><input class="form-input" type="date"></div></div>
+      <div class="form-group"><label class="form-label">Prioridade</label><select class="form-select"><option>🔴 Crítica</option><option>🟡 Alta</option><option>🟢 Normal</option></select></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-ghost" onclick="closeModal('modal-nova-tarefa')">Cancelar</button><button class="btn btn-primary" onclick="closeModal('modal-nova-tarefa')">Criar Tarefa</button></div>
+  </div>
+</div>
+
+<script>
+function showPage(id, navEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const p = document.getElementById('page-' + id);
+  if (p) p.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (navEl) navEl.classList.add('active');
+  document.getElementById('main').scrollTop = 0;
+}
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+</script>
+</body>
+</html>
